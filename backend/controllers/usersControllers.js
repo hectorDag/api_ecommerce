@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 const registerUser = asyncHandler ( async (req,res) => {
-    const {name, email, password} = req.body
+    const {name, email, password, admin} = req.body
 
     if(!name || !email || !password) {
         res.status(400)
@@ -23,15 +23,25 @@ const registerUser = asyncHandler ( async (req,res) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        admin
     })
 
     if(user) {
-        res.status(201).json({
-            _id: user.id,
-            name: user.name,
-            email: user.email
-        })
+        if(user.admin != true){
+            res.status(201).json({
+                _id: user.id,
+                name: user.name,
+                email: user.email,
+            })
+        }else {
+            res.status(201).json({
+                _id: user.id,
+                name: user.name,
+                email: user.email,
+                admin: user.admin
+            })
+        }
     }else {
         res.status(400)
         throw new Error ('Error al Crear Usuario')
